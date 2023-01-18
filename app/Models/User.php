@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Notifications\Auth\ResetPasswordNotification;
+use App\Notifications\Auth\VerifyEmailNotification;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -43,11 +45,17 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
     ];
 
+    /**
+     * Get the columns that should receive a unique identifier.
+     */
     public function uniqueIds(): array
     {
         return ['uuid'];
     }
 
+    /**
+     * Cast the password attribute.
+     */
     protected function password(): Attribute
     {
         return Attribute::make(
@@ -55,13 +63,19 @@ class User extends Authenticatable implements MustVerifyEmail
         );
     }
 
-    // public function sendEmailVerificationNotification(): void
-    // {
-    //     $this->notify(new VerifyEmailNotification());
-    // }
+    /**
+     * Send the email verification notification.
+     */
+    public function sendEmailVerificationNotification(): void
+    {
+        $this->notify(new VerifyEmailNotification());
+    }
 
-    // public function sendPasswordResetNotification($token): void
-    // {
-    //     $this->notify(new ResetPasswordNotification($token));
-    // }
+    /**
+     * Send the password reset notification.
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPasswordNotification($token));
+    }
 }

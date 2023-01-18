@@ -11,21 +11,21 @@ use Illuminate\Support\Facades\Route;
 /*********** Authentication Routes ***********/
 
 Route::middleware(['guest'])->group(function () {
-    Route::post('/register', [RegisteredUserController::class, 'store'])->name('register');
-
     Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login');
 
-    Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])->name('password.email');
+    Route::post('/register', RegisteredUserController::class)->name('register');
 
-    Route::post('/reset-password', [NewPasswordController::class, 'store'])->name('password.store');
+    Route::post('/forgot-password', PasswordResetLinkController::class)->name('password.email');
+
+    Route::post('/reset-password', NewPasswordController::class)->name('password.reset');
 });
 
 Route::middleware(['auth'])->group(function () {
-    Route::middleware(['throttle:6,1'])->group(function () {
-        Route::get('/verify-email/{id}/{hash}', [VerifyEmailController::class, '__invoke'])->middleware(['signed'])->name('verification.verify');
-
-        Route::post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store'])->name('verification.send');
-    });
-
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+
+    Route::middleware(['throttle:6,1'])->group(function () {
+        Route::get('/verify-email/{uuid}/{hash}', VerifyEmailController::class)->middleware(['signed'])->name('verification.verify');
+
+        Route::post('/email/verification-notification', EmailVerificationNotificationController::class)->name('verification.send');
+    });
 });

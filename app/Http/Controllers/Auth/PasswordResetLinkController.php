@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\PasswordLinkRequest;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 
@@ -13,10 +12,8 @@ class PasswordResetLinkController extends Controller
 {
     /**
      * Handle an incoming password reset link request.
-     *
-     * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(PasswordLinkRequest $request): JsonResponse
+    public function __invoke(PasswordLinkRequest $request): JsonResponse
     {
         $status = Password::sendResetLink($request->only('email'));
 
