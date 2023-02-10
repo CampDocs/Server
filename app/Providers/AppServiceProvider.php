@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Support\Provider\RegisterMacros;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
@@ -22,6 +23,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        RegisterMacros::handle();
+
         $this->registerModelConfig();
 
         $this->registerPasswordConfig();
