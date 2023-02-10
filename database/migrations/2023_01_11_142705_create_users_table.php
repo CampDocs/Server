@@ -16,10 +16,16 @@ return new class extends Migration
             $table->uuid();
             $table->string('name');
             $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
+            $table->string('phone');
+            $table->timestampTz('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
-            $table->timestamps();
+            $table->string('two_factor_type');
+            $table->text('two_factor_secret')->nullable();
+            $table->text('two_factor_recovery_codes')->nullable();
+            $table->timestampTz('two_factor_created_at')->nullable();
+            $table->timestampTz('two_factor_confirmed_at')->nullable();
+            $table->timestampsTz();
         });
     }
 

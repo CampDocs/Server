@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
@@ -10,22 +11,26 @@ use Illuminate\Support\Facades\Route;
 
 /*********** Authentication Routes ***********/
 
-Route::middleware(['guest'])->group(function () {
-    Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login');
+Route::prefix('/auth')->group(function () {
+    Route::middleware(['guest'])->group(function () {
+        Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 
-    Route::post('/register', RegisteredUserController::class)->name('register');
+        Route::post('/register', RegisteredUserController::class);
 
-    Route::post('/forgot-password', PasswordResetLinkController::class)->name('password.email');
+        Route::post('/forgot-password', PasswordResetLinkController::class);
 
-    Route::post('/reset-password', NewPasswordController::class)->name('password.reset');
-});
+        Route::post('/reset-password', NewPasswordController::class);
+    });
 
-Route::middleware(['auth'])->group(function () {
-    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+    Route::middleware(['auth'])->group(function () {
+        Route::post('/logout', [AuthenticatedSessionController::class, 'destroy']);
 
-    Route::middleware(['throttle:6,1'])->group(function () {
-        Route::get('/verify-email/{uuid}/{hash}', VerifyEmailController::class)->middleware(['signed'])->name('verification.verify');
+        Route::middleware(['throttle:6,1'])->group(function () {
+            Route::post('/confirm-password', ConfirmablePasswordController::class);
 
-        Route::post('/email/verification-notification', EmailVerificationNotificationController::class)->name('verification.send');
+            Route::get('/verify-email/{uuid}/{hash}', VerifyEmailController::class)->middleware(['signed']);
+
+            Route::post('/email/verification-notification', EmailVerificationNotificationController::class);
+        });
     });
 });

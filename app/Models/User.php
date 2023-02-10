@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Enums\TwoFactorEnum;
 use App\Notifications\Auth\ResetPasswordNotification;
 use App\Notifications\Auth\VerifyEmailNotification;
+use App\Traits\TwoFactor\HasTwoFactor;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -19,6 +21,7 @@ class User extends Authenticatable implements MustVerifyEmail
     use HasFactory;
     use Notifiable;
     use HasApiTokens;
+    use HasTwoFactor;
 
     /**
      * The attributes that are mass assignable.
@@ -41,8 +44,17 @@ class User extends Authenticatable implements MustVerifyEmail
      * The attributes that should be cast.
      */
     protected $casts = [
-        // 'two_factor_type' => TwoFactorEnum::class,
+        'two_factor_type' => TwoFactorEnum::class,
         'email_verified_at' => 'datetime',
+        'two_factor_created_at' => 'datetime',
+        'two_factor_confirmed_at' => 'datetime',
+    ];
+
+    /**
+     * The attributes that should be appended to the model.
+     */
+    protected $attributes = [
+        'two_factor_type' => TwoFactorEnum::NONE,
     ];
 
     /**

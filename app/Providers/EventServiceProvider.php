@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Listeners\TwoFactor\TwoFactorListener;
+use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -13,6 +15,9 @@ class EventServiceProvider extends ServiceProvider
      * The event to listener mappings for the application.
      */
     protected $listen = [
+        Login::class => [
+            TwoFactorListener::class,
+        ],
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],

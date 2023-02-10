@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Actions\Auth\ConfigureNewPassword;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\NewPasswordRequest;
-use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class NewPasswordController extends Controller
@@ -17,17 +16,9 @@ class NewPasswordController extends Controller
      */
     public function __invoke(NewPasswordRequest $request): JsonResponse
     {
-        $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
-            function ($user) use ($request) {
-                $user->forceFill([
-                    'password' => $request->password,
-                    'remember_token' => Str::random(60),
-                ])->save();
+        $credentials = $request->only('email', 'password', 'password_confirmation', 'token');
 
-                event(new PasswordReset($user));
-            }
-        );
+        $status = Password::reset($credentials, app(ConfigureNewPassword::class)->handle($request));
 
         if ($status != Password::PASSWORD_RESET) {
             throw ValidationException::withMessages([
@@ -35,6 +26,6 @@ class NewPasswordController extends Controller
             ]);
         }
 
-        return response()->json(['status' => trans($status)]);
+        return $this->ok(trans($status));
     }
 }
